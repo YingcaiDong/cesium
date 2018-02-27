@@ -159,6 +159,7 @@ define([
             requestCompletedEvent.raiseEvent();
             request.state = RequestState.RECEIVED;
             request.deferred.resolve(results);
+            console.log(request.url.slice(0, 50));
         };
     }
 

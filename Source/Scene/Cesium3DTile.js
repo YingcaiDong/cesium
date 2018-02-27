@@ -252,8 +252,6 @@ define([
         /**
          * The corresponding node in the cache.
          *
-         * See {@link Cesium3DTilesetCache}
-         *
          * @type {DoublyLinkedListNode}
          * @readonly
          *
@@ -327,10 +325,12 @@ define([
         this._selectionDepth = 0;
         this._lastSelectionDepth = undefined;
         this._requestedFrame = undefined;
-        this._lastVisitedFrame = undefined;
-        this._ancestorWithContent = undefined;
-        this._ancestorWithLoadedContent = undefined;
+        this._visitedFrame = undefined;
+        this._updatedFrame = undefined;
+        this._touchedFrame = 0;
+        this._ancestorWithContentAvailable = undefined;
         this._isClipped = true;
+        this._refines = false;
 
         this._debugBoundingVolume = undefined;
         this._debugContentBoundingVolume = undefined;
@@ -446,13 +446,13 @@ define([
          */
         contentAvailable : {
             get : function() {
-                return this.contentReady || (defined(this._expiredContent) && this._contentState !== Cesium3DTileContentState.FAILED);
+                return (this.contentReady && this.hasRenderableContent) || (defined(this._expiredContent) && this._contentState !== Cesium3DTileContentState.FAILED);
             }
         },
 
         /**
-         * Determines if the tile is ready to render. <code>true</code> if the tile
-         * is ready to render; otherwise, <code>false</code>.
+         * Determines if the tile's content is ready. This is automatically <code>true</code> for
+         * tile's with empty content.
          *
          * @memberof Cesium3DTile.prototype
          *
@@ -597,7 +597,9 @@ define([
 
     function createPriorityFunction(tile) {
         return function() {
-            return tile._distanceToCamera;
+            // TODO
+            return 1000000.0 - tile._screenSpaceError;
+            //return tile._distanceToCamera;
         };
     }
 
@@ -689,6 +691,7 @@ define([
                 updateExpireDate(that);
 
                 // Refresh style for expired content
+                that._lastSelectedFrameNumber = 0;
                 that.lastStyleTime = 0;
 
                 that._contentState = Cesium3DTileContentState.READY;
