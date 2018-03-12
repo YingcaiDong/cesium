@@ -98,17 +98,22 @@ define([
             deprecationWarning('CesiumTerrainProvider.proxy', 'The options.proxy parameter has been deprecated. Specify options.url as a Resource instance and set the proxy property there.');
         }
 
+        // 选择 GeographicTilingScheme, 之前已经comment过了
         this._tilingScheme = new GeographicTilingScheme({
+            // 设置 z-level = 0 时候的 x,y方向瓦片数量
             numberOfLevelZeroTilesX : 2,
             numberOfLevelZeroTilesY : 1,
             ellipsoid : options.ellipsoid
         });
 
+        //TODO: 不太清楚
+        // 但是 heightmap 是 CesiumTerrainProvider 支持的一种格式
         this._heightmapWidth = 65;
         this._levelZeroMaximumGeometricError = TerrainProvider.getEstimatedLevelZeroGeometricErrorForAHeightmap(this._tilingScheme.ellipsoid, this._heightmapWidth, this._tilingScheme.getNumberOfXTilesAtLevel(0));
 
         this._heightmapStructure = undefined;
         this._hasWaterMask = false;
+        // 没有法线
         this._hasVertexNormals = false;
 
         /**
@@ -158,10 +163,12 @@ define([
                 resource.appendForwardSlash();
                 lastResource = resource;
                 metadataResource = lastResource.getDerivedResource({
+                    // 我们要提供的 json
                     url: 'layer.json'
                 });
 
                 var uri = new Uri(metadataResource.url);
+            // 如果 layer.json 中含有一下内容，报warning
                 if (uri.authority === 'assets.agi.com') {
                     var deprecationText = 'The STK World Terrain tileset is deprecated and will be available until September 1, 2018';
                     var deprecationLinkText = 'Check out the new high-resolution Cesium World Terrain';
@@ -182,6 +189,7 @@ define([
                 deferred.reject(e);
             });
 
+        // 解析 json
         function parseMetadataSuccess(data) {
             var message;
 
@@ -191,6 +199,7 @@ define([
                 return;
             }
 
+            // json 中应含有 tile 这一项， 且 tile.lenght > 0
             if (!data.tiles || data.tiles.length === 0) {
                 message = 'The layer.json file does not specify any tile URL templates.';
                 metadataError = TileProviderError.handleError(metadataError, that, that._errorEvent, message, undefined, undefined, undefined, requestMetadata);
