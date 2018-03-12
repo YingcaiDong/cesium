@@ -30,8 +30,11 @@ define([
      * @see WebMercatorProjection
      */
     function GeographicProjection(ellipsoid) {
+        // 选择需要映射的球体，一般来说都是Cesium.Viewer.glob.ellipsoid.
         this._ellipsoid = defaultValue(ellipsoid, Ellipsoid.WGS84);
+        // 得到球体的最大半径
         this._semimajorAxis = this._ellipsoid.maximumRadius;
+        // 得到半径分之1
         this._oneOverSemimajorAxis = 1.0 / this._semimajorAxis;
     }
 
@@ -63,11 +66,16 @@ define([
      *          coordinates are copied there and that instance is returned.  Otherwise, a new instance is
      *          created and returned.
      */
+    // 映射的方法
     GeographicProjection.prototype.project = function(cartographic, result) {
         // Actually this is the special case of equidistant cylindrical called the plate carree
+        // 得到之前赋值的球体最大半径
         var semimajorAxis = this._semimajorAxis;
+        // 这里就是具体的映射过程了。也很直白。
+        // 就是把需要转换的的坐标Cartographic.x/y 乘以最大半径即可
         var x = cartographic.longitude * semimajorAxis;
         var y = cartographic.latitude * semimajorAxis;
+        // 高度保持不变
         var z = cartographic.height;
 
         if (!defined(result)) {
@@ -92,6 +100,7 @@ define([
      *          coordinates are copied there and that instance is returned.  Otherwise, a new instance is
      *          created and returned.
      */
+    // 反映射的方法
     GeographicProjection.prototype.unproject = function(cartesian, result) {
         //>>includeStart('debug', pragmas.debug);
         if (!defined(cartesian)) {
@@ -100,8 +109,12 @@ define([
         //>>includeEnd('debug');
 
         var oneOverEarthSemimajorAxis = this._oneOverSemimajorAxis;
+        // 反映射的做法也很直白，就是把上面映射的过程反过来
+        // 因为之前映射是 x, y 坐标乘以最大半径
+        // 因此现在就都除以最大半径就搞定了。
         var longitude = cartesian.x * oneOverEarthSemimajorAxis;
         var latitude = cartesian.y * oneOverEarthSemimajorAxis;
+        // 同样的，高度保持不变。
         var height = cartesian.z;
 
         if (!defined(result)) {
