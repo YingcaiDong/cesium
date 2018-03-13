@@ -31,6 +31,7 @@ define([
      *
      * @see Packable
      */
+    // Rectangle 的坐标是用弧度标注的
     function Rectangle(west, south, east, north) {
         /**
          * The westernmost longitude in radians in the range [-Pi, Pi].
@@ -104,6 +105,7 @@ define([
      *
      * @returns {Number[]} The array that was packed into
      */
+    // 通过这个方法可以得到一个含有这个矩形东西南北用弧度表示的数据
     Rectangle.pack = function(value, array, startingIndex) {
         //>>includeStart('debug', pragmas.debug);
         Check.typeOf.object('value', value);
@@ -128,6 +130,7 @@ define([
      * @param {Rectangle} [result] The object into which to store the result.
      * @returns {Rectangle} The modified result parameter or a new Rectangle instance if one was not provided.
      */
+    // 也可以通过读取一个包含4个弧度数据的array来给这个矩形赋值
     Rectangle.unpack = function(array, startingIndex, result) {
         //>>includeStart('debug', pragmas.debug);
         Check.defined('array', array);
@@ -188,6 +191,7 @@ define([
      * @example
      * var rectangle = Cesium.Rectangle.fromDegrees(0.0, 20.0, 10.0, 30.0);
      */
+    // 矩形也可以用角度进行赋值
     Rectangle.fromDegrees = function(west, south, east, north, result) {
         west = CesiumMath.toRadians(defaultValue(west, 0.0));
         south = CesiumMath.toRadians(defaultValue(south, 0.0));
@@ -219,6 +223,7 @@ define([
      * @example
      * var rectangle = Cesium.Rectangle.fromRadians(0.0, Math.PI/4, Math.PI/8, 3*Math.PI/4);
      */
+    // 矩形也可以用弧度进行赋值
     Rectangle.fromRadians = function(west, south, east, north, result) {
         if (!defined(result)) {
             return new Rectangle(west, south, east, north);
@@ -239,6 +244,8 @@ define([
      * @param {Rectangle} [result] The object onto which to store the result, or undefined if a new instance should be created.
      * @returns {Rectangle} The modified result parameter or a new Rectangle instance if none was provided.
      */
+    // 或者用通用坐标系序列来定义矩形序列
+    // 因为每个通用坐标系只有三个值，能用的只有两个（经度和维度）所以要配合一些默认的设置才能形成一个矩形
     Rectangle.fromCartographicArray = function(cartographics, result) {
         //>>includeStart('debug', pragmas.debug);
         Check.defined('cartographics', cartographics);
@@ -294,6 +301,7 @@ define([
      * @param {Rectangle} [result] The object onto which to store the result, or undefined if a new instance should be created.
      * @returns {Rectangle} The modified result parameter or a new Rectangle instance if none was provided.
      */
+    // 同理，可以看上面的通用坐标系的那个方法
     Rectangle.fromCartesianArray = function(cartesians, ellipsoid, result) {
         //>>includeStart('debug', pragmas.debug);
         Check.defined('cartesians', cartesians);
@@ -585,6 +593,7 @@ define([
      * @param {Rectangle} [result] The object onto which to store the result.
      * @returns {Rectangle|undefined} The modified result parameter, a new Rectangle instance if none was provided or undefined if there is no intersection.
      */
+    // 看是否有交叉区域，有就返回交叉区域形成的矩形
     Rectangle.intersection = function(rectangle, otherRectangle, result) {
         //>>includeStart('debug', pragmas.debug);
         Check.typeOf.object('rectangle', rectangle);
