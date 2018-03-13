@@ -27,6 +27,10 @@ define([
      *
      * @see Ellipsoid
      */
+    // 仔细看了一下 Cartographic 这个类，其通用的经纬度都是用弧度标注的。无论输入是角度还是弧度，最终都会转换为弧度。
+    // 因此我推断这是在程序中一个通用的坐标系，即开发者只要使用这个类进行坐标系的表达就不用担心弧度角度的不同和转换问题。
+    // 这个类的所有方法包括构造方法都是以弧度为标准表达和输出的。
+    // 我想这也是 Cartographic 和 Cartesian 之间的区别吧
     function Cartographic(longitude, latitude, height) {
         /**
          * The longitude, in radians.
@@ -60,6 +64,8 @@ define([
      * @param {Cartographic} [result] The object onto which to store the result.
      * @returns {Cartographic} The modified result parameter or a new Cartographic instance if one was not provided.
      */
+    // 和 Cartesian 类中的 fromRadians 不同的是 Cartesian 的同名方法将弧度转化为角度并返回
+    // 而 Cartographic 类中的这个方法则直接使用输入的弧度值进行输出
     Cartographic.fromRadians = function(longitude, latitude, height, result) {
         //>>includeStart('debug', pragmas.debug);
         Check.typeOf.number('longitude', longitude);
@@ -89,6 +95,7 @@ define([
      * @param {Cartographic} [result] The object onto which to store the result.
      * @returns {Cartographic} The modified result parameter or a new Cartographic instance if one was not provided.
      */
+    // 这个方法是将输入的角度值 （经度和纬度）转换为弧度然后进行输出
     Cartographic.fromDegrees = function(longitude, latitude, height, result) {
         //>>includeStart('debug', pragmas.debug);
         Check.typeOf.number('longitude', longitude);
@@ -116,6 +123,7 @@ define([
      * @param {Cartographic} [result] The object onto which to store the result.
      * @returns {Cartographic} The modified result parameter, new Cartographic instance if none was provided, or undefined if the cartesian is at the center of the ellipsoid.
      */
+    // 同样是将 Cartesian 的坐标进行转换变成同意的弧度表达并输出
     Cartographic.fromCartesian = function(cartesian, ellipsoid, result) {
         var oneOverRadii = defined(ellipsoid) ? ellipsoid.oneOverRadii : wgs84OneOverRadii;
         var oneOverRadiiSquared = defined(ellipsoid) ? ellipsoid.oneOverRadiiSquared : wgs84OneOverRadiiSquared;
@@ -155,6 +163,9 @@ define([
      * @param {Cartesian3} [result] The object onto which to store the result.
      * @returns {Cartesian3} The position
      */
+    // 将弧度坐标转化为 Cartesian3 支持的角度坐标
+    // 这里还调用了 Cartesian3 的一个方法，如果 .fromeRadians() 是从弧度转角度的话
+    // 因为这个调用的方法源代码我也没看懂
     Cartographic.toCartesian = function(cartographic, ellipsoid, result) {
         //>>includeStart('debug', pragmas.debug);
         Check.defined('cartographic', cartographic);
