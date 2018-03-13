@@ -106,8 +106,7 @@ define([
             ellipsoid : options.ellipsoid
         });
 
-        //TODO: 不太清楚
-        // 但是 heightmap 是 CesiumTerrainProvider 支持的一种格式
+        // 设置每片划分的区域，都有65*65个瓦片
         this._heightmapWidth = 65;
         this._levelZeroMaximumGeometricError = TerrainProvider.getEstimatedLevelZeroGeometricErrorForAHeightmap(this._tilingScheme.ellipsoid, this._heightmapWidth, this._tilingScheme.getNumberOfXTilesAtLevel(0));
 
